@@ -1,5 +1,5 @@
 /* オフラインでも開けるようにする。更新時は VERSION を上げる */
-const VERSION = 'eclat-2026-11-14';
+const VERSION = 'eclat-2026-11-14b';
 const CORE = ['./', 'index.html', 'css/app.css', 'manifest.webmanifest', 'js/data-lessons.js', 'js/data-videos.js', 'js/data-quiz.js', 'js/data-styles.js', 'js/data-updates.js', 'js/diagrams.js', 'js/app.js', 'icons/icon-192.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
