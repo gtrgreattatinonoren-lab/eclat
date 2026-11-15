@@ -43,6 +43,7 @@
     </svg>` };
 
   D.elevation = {
+    imgs: [{ label: '女性', src: 'img/diagram/elevation-f.jpg' }, { label: '男性', src: 'img/diagram/elevation-m.jpg' }],
     cap: '毛束を引き出す角度(エレベーション)と仕上がりの関係',
     svg: `<svg viewBox="0 0 500 300" role="img" aria-label="エレベーションの図">
       <circle cx="150" cy="140" r="96" class="svg-line"/>
