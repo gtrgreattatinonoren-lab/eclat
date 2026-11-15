@@ -57,6 +57,7 @@
     </svg>` };
 
   D.colorwheel = {
+    img: 'img/diagram/colorwheel.jpg',
     cap: '向かい合う色が補色。混ぜると打ち消しあう',
     svg: (() => {
       const cols = [['赤', '#b8473a'], ['オレンジ', '#d4823a'], ['黄', '#d6bf45'], ['緑', '#5a8f55'], ['青', '#3f64a3'], ['紫', '#7a55a0']];
