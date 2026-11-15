@@ -333,3 +333,18 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 .field-bar button { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 999px; font-size: 13px; color: var(--muted); letter-spacing: .06em; }
 .field-bar button .icon { width: 16px; height: 16px; }
 .field-bar button.on { background: var(--gold); color: #1a1508; font-weight: 600; }
+
+/* 都道府県別 開業ガイド */
+.pref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.pref-btn { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: 14px; letter-spacing: .06em; text-align: center; touch-action: manipulation; }
+.pref-btn:hover, .pref-btn:active { border-color: var(--gold); color: var(--gold2); }
+.kg-dl { display: grid; grid-template-columns: 5em 1fr; gap: 8px 12px; margin: 0 0 12px; font-size: 14px; }
+.kg-dl dt { color: var(--gold2); font-size: 12px; letter-spacing: .12em; padding-top: 2px; }
+.kg-dl dd { margin: 0; }
+.kg-list { margin: 0 0 12px; padding-left: 1.2em; font-size: 14px; line-height: 1.8; }
+.kg-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.kg-sub b { display: block; font-weight: 500; margin-bottom: 6px; }
+.kg-sub p { margin: 6px 0 10px; }
+.kg-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.kg-meta span { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--surface2); color: var(--gold2); }
+.kg-pager { display: flex; justify-content: space-between; gap: 8px; margin-top: 20px; }

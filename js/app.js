@@ -85,7 +85,7 @@
     if (S.track && !force) return;
     const el = document.createElement('div');
     el.className = 'onboard fade';
-    const keys = ['student', 'exam', 'assistant', 'pro'];
+    const keys = ['student', 'exam', 'assistant', 'pro', 'owner'].filter(k => TRACKS[k]);
     el.innerHTML = `<div class="in"><div class="eyebrow">Hair Academy for Beginners</div><div class="mark">ÉCLAT</div>
       <p class="lead">美容師をめざす人の、技術と知識のノート。<br>今のあなたに合わせて、学ぶ順番を用意します。</p>
       <div class="tracks">${keys.map((k, i) => `<button class="trk" data-track="${k}"><span class="no">0${i + 1}</span><span><em>${TRACKS[k].en}</em><b>${TRACKS[k].name}</b><p>${TRACKS[k].lead}</p></span></button>`).join('')}</div>
@@ -116,6 +116,7 @@
         <section class="section"><div class="section-head"><div><div class="eyebrow">Your path</div><h2>あなたの学ぶ順番</h2></div><a href="#/learn">すべてのレッスン</a></div>
           <div class="path">${path.map((l, i) => `<a class="path-item ${S.done[l.id] ? 'done' : ''}" href="#/lesson/${l.id}"><span class="path-no">${S.done[l.id] ? icon('check') : i + 1}</span><span class="t"><b>${esc(l.title)}</b><span>${esc(catName[l.cat])} · ${l.min}分</span></span></a>`).join('')}</div></section>
       </div><div>
+        ${S.track === 'owner' ? kaigyoCard() : ''}
         ${up ? `<section class="section"><div class="section-head"><div><div class="eyebrow">Monthly update</div><h2>${monthLabel(up.month)}のトレンド</h2></div><a href="#/trends">すべて見る</a></div>
           <div class="grid">${(up.trends || []).slice(0, 3).map(tr => `<a class="card trend" href="#/trends"><span class="tag">${kindLabel(tr.kind)}</span><h3>${esc(tr.title)}</h3><p class="muted small" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(tr.summary)}</p></a>`).join('')}</div></section>` : ''}
         <section class="section"><div class="section-head"><div><div class="eyebrow">Watch</div><h2>おすすめ動画</h2></div><a href="#/videos">動画一覧</a></div>
@@ -154,11 +155,13 @@
     else if (cat && catField[cat] && catField[cat] !== S.field) { S.field = catField[cat]; save(); }
     if (isBeauty() && !cat) cat = sub();
     const fc = fieldCats(), fids = fc.map(c => c.id);
+    const ownerBanner = cat === 'owner' || (cat === 'mine' && t === 'owner') ? kaigyoCard() : '';
     const list = LESSONS.filter(l => fids.includes(l.cat)).filter(l => !cat || cat === 'mine' ? (cat === 'mine' ? l.tracks.includes(t) : true) : l.cat === cat);
     return `<div class="fade">${fieldBar()}<div class="eyebrow">Lessons</div><h1>学ぶ${isBeauty() ? ':' + esc(catName[cat]) : ''}</h1>
       <p class="muted">${isBeauty() ? 'メイク・ネイル・まつ毛・スキンケア・着付けを、ヘアとは別枠でまとめています。' : '図解と動画で、ひとつずつ。'}読み終えたら「読んだ」を押すと進み具合に反映されます。</p>
       ${isBeauty() ? '<div style="height:18px"></div>' : `<div class="chips" style="margin:18px 0 22px"><a class="chip ${!cat ? 'on' : ''}" href="#/learn">すべて</a>${`<a class="chip ${cat === 'mine' ? 'on' : ''}" href="#/learn/mine">${esc((TRACKS[t] || {}).name || 'マイコース')}向け</a>`}${fc.map(c => `<a class="chip ${cat === c.id ? 'on' : ''}" href="#/learn/${c.id}">${c.name}</a>`).join('')}</div>`}
       ${!cat ? `<div class="catgrid" style="margin-bottom:28px">${fc.map(c => `<a class="cat" href="#/learn/${c.id}">${icon(c.icon)}<b>${c.name}</b><span>${c.en}</span></a>`).join('')}</div>` : ''}
+      ${ownerBanner}
       ${(() => { if (!cat || cat === 'mine') return ''; const up = UPDATES.find(u => catTrends(u, cat).length); const l = catTrends(up, cat); return l.length ? `<section class="section" style="margin-top:0"><div class="section-head"><div><div class="eyebrow">Trend · ${monthLabel(up.month)}</div><h2>${esc(catName[cat])}の最新トレンド</h2></div><a href="#/trends/c-${cat}/${up.month}">すべて見る</a></div><div class="grid c2">${l.slice(0, 2).map(trendCard).join('')}</div></section>` : ''; })()}
       <div class="grid c3">${list.map(lessonCard).join('')}</div>
       ${isBeauty() ? '' : `<section class="section card pad"><div class="eyebrow">License exam</div><h2 style="margin:4px 0 8px">国家試験クイズ</h2><p class="muted small" style="margin:0 0 14px">学科5科目の練習問題(オリジナル)。</p><a class="btn gold" href="#/quiz">科目を選ぶ</a></section>`}</div>`;
@@ -171,6 +174,7 @@
     if (b.list) return `<ul>${b.list.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
     if (b.steps) return `<ol class="steps">${b.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
     if (b.table) return `<div class="tablewrap"><table><thead><tr>${b.table.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.table.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    if (b.go) return `<p><a class="btn gold" href="${esc(b.go[0])}">${esc(b.go[1])}${icon('arrow')}</a></p>`;
     if (b.tip) return `<div class="note tip">${icon('bulb')}<b>POINT</b>${esc(b.tip)}</div>`;
     if (b.ng) return `<div class="note ng">${icon('alert')}<b>CAUTION</b>${esc(b.ng)}</div>`;
     if (b.diagram && window.DIAGRAMS[b.diagram]) {
@@ -342,6 +346,52 @@
   }
 
   /* ── 画面:探す ── */
+  /* ── 画面:都道府県別 開業ガイド ── */
+  function kaigyoCard() {
+    return `<section class="section card pad kaigyo-card"><div class="eyebrow">Opening guide</div><h2 style="margin:4px 0 8px">都道府県別 開業ガイド</h2>
+      <p class="muted small" style="margin:0 0 14px">47都道府県の保健所の手続き(窓口・手数料・注意点)と、起業支援金・補助金を県ごとにまとめました。</p>
+      <a class="btn gold sm" href="#/kaigyo">県を選ぶ${icon('arrow')}</a></section>`;
+  }
+  function viewKaigyo(id) {
+    const P = window.PREFS || [];
+    const checked = esc(window.PREFS_CHECKED || '');
+    const p = P.find(x => x.id === id);
+    if (!p) {
+      const regions = [...new Set(P.map(x => x.region))];
+      return `<div class="fade"><a class="back" href="#/learn/owner">${icon('arrow')}経営・開業のレッスン</a>
+        <div class="eyebrow">Opening guide</div><h1>都道府県別 開業ガイド</h1>
+        <p class="muted">美容室を開くときの保健所の手続きと、使える起業支援金・補助金を都道府県ごとに調べました。<b>県の名前を押すと詳しい内容が見られます。</b></p>
+        <div class="note tip">${icon('bulb')}<b>POINT</b>美容所の開設届は「お店の所在地」の保健所に出します。政令市・中核市などは市の保健所が窓口です。手数料は多くの県で16,000〜17,600円、東京の多くの区・市は24,000円前後です。</div>
+        ${regions.map(r => `<section class="section"><h2 style="margin:0 0 12px">${esc(r)}</h2><div class="pref-grid">${P.filter(x => x.region === r).map(x => `<a class="pref-btn" href="#/kaigyo/${x.id}">${esc(x.name)}</a>`).join('')}</div></section>`).join('')}
+        <section class="section card pad"><div class="eyebrow">Nationwide</div><h2 style="margin:4px 0 10px">全国どこでも使える制度</h2>
+          <ul class="kg-list"><li><b>小規模事業者持続化補助金(創業型)</b>:創業後1年以内。上限200万円・補助率2/3。商工会・商工会議所に相談</li>
+          <li><b>日本政策金融公庫</b>:生活衛生貸付・新規開業資金(500万円を超える設備資金は、県の生活衛生営業指導センターの推薦書が必要)</li>
+          <li><b>デジタル化・AI導入補助金</b>(旧IT導入補助金):予約・顧客管理・レジなどのソフト</li>
+          <li><b>業務改善助成金・キャリアアップ助成金</b>(厚生労働省):賃上げ+設備投資、正社員化など</li></ul>
+          <a class="btn sm" href="#/lesson/owner-money">お金のレッスンで詳しく見る</a></section>
+        <p class="small muted" style="margin-top:18px">調べた日:${checked}。金額・募集時期は毎年変わります。使う前に必ず公式ページと窓口で確認してください。</p></div>`;
+    }
+    const h = p.health, i = P.indexOf(p), prev = P[i - 1], next = P[i + 1];
+    const short = p.name === '北海道' ? p.name : p.name.replace(/[都府県]$/, '');
+    const sub = x => `<div class="card pad kg-sub"><b>${esc(x.name)}</b><div class="kg-meta">${x.max && x.max !== '—' ? `<span>上限 ${esc(x.max)}</span>` : ''}${x.rate && x.rate !== '—' ? `<span>補助率 ${esc(x.rate)}</span>` : ''}</div><p class="small muted">${esc(x.org)}${x.period ? '/' + esc(x.period) : ''}</p>${x.url ? `<a class="btn sm" href="${esc(x.url)}" target="_blank" rel="noopener">${icon('ext')}公式ページ</a>` : ''}</div>`;
+    return `<div class="fade" style="max-width:820px"><a class="back" href="#/kaigyo">${icon('arrow')}都道府県を選ぶ</a>
+      <div class="eyebrow">${esc(p.region)}</div><h1>${esc(p.name)}の開業ガイド</h1>
+      <p class="muted">保健所の手続きと、${esc(p.name)}で使える起業支援金・補助金(${checked}調べ)。</p>
+      <section class="section"><div class="section-head"><div><div class="eyebrow">Health center</div><h2>保健所の手続き</h2></div></div>
+        <div class="card pad"><dl class="kg-dl"><dt>窓口</dt><dd>${esc(h.desk)}</dd><dt>手数料</dt><dd>${h.fee ? esc(h.fee) : '今回の調査では公式の金額を確認できませんでした。多くの県で16,000〜17,600円です。管轄の保健所に確認してください。'}</dd></dl>
+        ${h.notes && h.notes.length ? `<ul class="kg-list">${h.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
+        <div class="kg-btns">${h.url ? `<a class="btn sm" href="${esc(h.url)}" target="_blank" rel="noopener">${icon('ext')}公式の案内・手引き</a>` : ''}<a class="btn sm" href="${EXT.google(p.name + ' 美容所 開設届 保健所')}" target="_blank" rel="noopener">${icon('search')}最新情報を検索</a></div></div>
+        <p class="small muted" style="margin-top:10px">共通の流れ:工事の前に図面で事前相談 → 開設届・手数料を提出 → 保健所の検査 → 確認済証が出てから営業開始。<a href="#/lesson/owner-procedures">手続きのレッスンを見る</a></p></section>
+      <section class="section"><div class="section-head"><div><div class="eyebrow">Subsidy</div><h2>${esc(short)}の起業支援金・補助金</h2></div></div>
+        ${p.subs.length ? `<div class="grid c2">${p.subs.map(sub).join('')}</div>` : `<div class="card pad small muted">2026年度は、${esc(p.name)}が直接行う創業向けの補助金を確認できませんでした。市町村の制度と、全国共通の制度を使えます。</div>`}
+        <div class="kg-btns" style="margin-top:12px"><a class="btn sm" href="${EXT.google(p.name + ' 創業 補助金 起業支援金')}" target="_blank" rel="noopener">${icon('search')}最新の募集を検索</a></div></section>
+      ${p.local.length ? `<section class="section"><div class="section-head"><div><div class="eyebrow">City &amp; town</div><h2>市町村の制度(例)</h2></div></div><div class="card pad"><ul class="kg-list">${p.local.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p class="small muted" style="margin:8px 0 0">お店を出す市町村の商工担当課や商工会でも確認しましょう。</p></div></section>` : ''}
+      <section class="section"><div class="section-head"><div><div class="eyebrow">Nationwide</div><h2>全国共通の制度</h2></div></div>
+        <div class="card pad"><ul class="kg-list"><li>小規模事業者持続化補助金(創業型):上限200万円・補助率2/3</li><li>日本政策金融公庫の生活衛生貸付・新規開業資金</li><li>デジタル化・AI導入補助金、業務改善助成金、キャリアアップ助成金</li></ul><a class="btn sm" href="#/lesson/owner-money">お金のレッスンを見る</a></div></section>
+      <div class="note ng">${icon('alert')}<b>CAUTION</b>募集期間・金額・条件は毎年変わります。「終了」と書いた制度も、翌年度の同じ時期に募集されることが多いです。申し込む前に必ず公式ページで確認してください。</div>
+      <div class="kg-pager">${prev ? `<a class="btn sm" href="#/kaigyo/${prev.id}">← ${esc(prev.name)}</a>` : '<span></span>'}${next ? `<a class="btn sm" href="#/kaigyo/${next.id}">${esc(next.name)} →</a>` : ''}</div></div>`;
+  }
+
   function viewSearch(q) {
     q = (q || '').trim();
     const hit = s => s && s.toLowerCase().includes(q.toLowerCase());
@@ -352,11 +402,13 @@
       const vs = VIDEOS.filter(v => hit(v.title) || hit(v.ch));
       const ts = UPDATES.flatMap(u => ['trends', 'instagram', 'techniques', 'salonWork', 'beauty'].flatMap(k => (u[k] || []).map(t => ({ ...t, month: u.month, k })))).filter(t => hit(t.title) || hit(t.summary));
       const ss = window.STYLES.filter(s => hit(s.name) || hit(s.tech) || hit(s.catch));
-      const total = ls.length + vs.length + ts.length + ss.length;
+      const ps = (window.PREFS || []).filter(p => hit(p.name) || hit(p.name.replace(/[都道府県]$/, '')) || p.local.some(hit) || p.subs.some(x => hit(x.name)));
+      const total = ls.length + vs.length + ts.length + ss.length + ps.length;
       results = `<section class="section"><div class="eyebrow">In this app</div><h2 style="margin-bottom:12px">アプリ内の結果 ${total}件</h2>
         ${total ? '' : '<p class="muted">アプリ内には見つかりませんでした。下のボタンでネットの最新情報を探せます。</p>'}
         <div class="grid c2">${ls.map(l => `<a class="card result" href="#/lesson/${l.id}"><span class="tag">レッスン</span> <b>${mark(l.title)}</b><span>${mark(l.summary)}</span></a>`).join('')}
         ${ts.map(t => `<a class="card result" href="#/trends/${t.k}/${t.month}"><span class="tag">${monthLabel(t.month)}</span> <b>${mark(t.title)}</b><span>${mark(t.summary.slice(0, 80))}…</span></a>`).join('')}
+        ${ps.map(p => `<a class="card result" href="#/kaigyo/${p.id}"><span class="tag">開業ガイド</span> <b>${mark(p.name)}</b><span>保健所の手続き・助成金</span></a>`).join('')}
         ${ss.map(s => `<button class="card result" style="text-align:left" data-style="${s.id}"><span class="tag">スタイル図鑑</span> <b>${mark(s.name)}</b><span>${mark(s.catch)}</span></button>`).join('')}</div>
         ${vs.length ? `<div class="grid c3" style="margin-top:14px">${vs.map(v => videoCard(v)).join('')}</div>` : ''}</section>`;
     }
@@ -404,6 +456,7 @@
       case 'trends': html = viewTrends(a, b); break;
       case 'quiz': html = viewQuiz(a); break;
       case 'search': html = viewSearch(a); break;
+      case 'kaigyo': html = viewKaigyo(a); break;
       case 'settings': html = viewSettings(); break;
       default: html = viewHome();
     }
