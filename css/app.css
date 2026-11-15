@@ -348,3 +348,10 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 .kg-meta { display: flex; flex-wrap: wrap; gap: 6px; }
 .kg-meta span { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: var(--surface2); color: var(--gold2); }
 .kg-pager { display: flex; justify-content: space-between; gap: 8px; margin-top: 20px; }
+.kg-dl-w { grid-template-columns: 6.5em 1fr; }
+.kg-table { width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; font-size: 13.5px; }
+.kg-table td { overflow-wrap: anywhere; }
+.kg-table th, .kg-table td { padding: 10px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; line-height: 1.7; }
+.kg-table tr:last-child th, .kg-table tr:last-child td { border-bottom: 0; }
+.kg-table th { width: 6.5em; font-weight: 500; white-space: nowrap; }
+.kg-table th a { color: var(--gold2); }

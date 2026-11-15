@@ -352,7 +352,38 @@
       <p class="muted small" style="margin:0 0 14px">47都道府県の保健所の手続き(窓口・手数料・注意点)と、起業支援金・補助金を県ごとにまとめました。</p>
       <a class="btn gold sm" href="#/kaigyo">県を選ぶ${icon('arrow')}</a></section>`;
   }
+  const LAWS = `<section class="section card pad"><div class="eyebrow">Laws</div><h2 style="margin:4px 0 10px">美容所の間取りを決める法律・条例のしくみ</h2>
+      <ul class="kg-list">
+        <li><b>美容師法</b>(国):第11〜13条。開設届、保健所の検査、「消毒設備・採光・照明・換気・その他の衛生上必要な措置」を義務づけ</li>
+        <li><b>美容師法施行規則</b>(国):第26・27条。床と腰板は水を通さない材料、作業面の照度100ルクス以上、空気1リットル中の炭酸ガス5㎤以下(0.5%)</li>
+        <li><b>都道府県・保健所設置市の「美容師法施行条例」と施行細則</b>:作業室の広さ、待合所の区画、洗髪設備、天井の高さなど<b>間取りの数字はここで決まる</b>ため、県や市ごとに違う</li>
+        <li><b>美容所における衛生管理要領</b>(厚生労働省の通知):消毒・換気・設備の目安。県の指導基準のもとになっている</li>
+        <li><b>そのほか</b>:消防法(防火対象物使用開始届・防火管理者)、建築基準法(大きな改装・用途変更)、屋外広告物条例(看板)、福祉のまちづくり条例(一定以上の広さの店)</li>
+      </ul>
+      <p class="small muted" style="margin:0">政令市・中核市・東京23区などは<b>市・区が独自の条例</b>を持っています。お店の住所の保健所の基準で設計しましょう。</p></section>`;
+  function ruleBlock(p, full) {
+    const r = (window.PREF_RULES || {})[p.id];
+    if (!r) return '';
+    const row = (k, v) => v ? `<dt>${k}</dt><dd>${esc(v)}</dd>` : '';
+    return `<section class="section"><div class="section-head"><div><div class="eyebrow">Layout rules</div><h2>間取り・構造の基準</h2></div>${full ? '' : '<a href="#/kaigyo/rules">全国を比べる</a>'}</div>
+      <div class="card pad">${r.scope === 'city' ? '<p class="small" style="margin:0 0 10px;color:var(--gold2)">県の数値は確認できなかったため、県内の市の基準を例として載せています。</p>' : ''}
+      <dl class="kg-dl kg-dl-w">${row('根拠', r.law)}${row('作業室の広さ', r.area || '今回の調査では数値を確認できませんでした。保健所の手引き・条例で確認してください')}${row('待合所・区画', r.wait && r.wait !== '—' ? r.wait : '')}${row('洗髪設備', r.shampoo)}</dl>
+      ${r.other && r.other.length ? `<ul class="kg-list">${r.other.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+      <div class="kg-btns">${r.src ? `<a class="btn sm" href="${esc(r.src)}" target="_blank" rel="noopener">${icon('ext')}根拠の資料</a>` : ''}<a class="btn sm" href="${EXT.google(p.name + ' 美容師法施行条例 美容所 作業室 面積')}" target="_blank" rel="noopener">${icon('search')}条例を検索</a></div></div>
+      <p class="small muted" style="margin-top:10px">どの県でも共通:床と腰板は水を通さない材料/照度100ルクス以上/炭酸ガス0.5%以下/消毒設備/消毒済みと未消毒の器具を分けて保管。</p></section>`;
+  }
+  function viewKaigyoRules() {
+    const P = window.PREFS || [], R = window.PREF_RULES || {};
+    const regions = [...new Set(P.map(x => x.region))];
+    return `<div class="fade" style="max-width:900px"><a class="back" href="#/kaigyo">${icon('arrow')}都道府県を選ぶ</a>
+      <div class="eyebrow">Layout rules</div><h1>美容所の広さの基準 全国比較</h1>
+      <p class="muted">作業室の最低面積と、いすを増やしたときの加算は、県(市)の条例で決まり、全国でばらばらです。県名を押すと詳しい内容を見られます。</p>
+      ${LAWS}
+      ${regions.map(rg => `<section class="section"><h2 style="margin:0 0 12px">${esc(rg)}</h2><div class="card"><table class="kg-table"><tbody>${P.filter(x => x.region === rg).map(x => { const r = R[x.id] || {}; return `<tr><th><a href="#/kaigyo/${x.id}">${esc(x.name)}</a></th><td>${r.area ? esc(r.area) : '<span class="muted">要確認</span>'}${r.scope === 'city' ? '<span class="tag" style="margin-left:6px">市の例</span>' : ''}</td></tr>`; }).join('')}</tbody></table></div></section>`).join('')}
+      <p class="small muted" style="margin-top:18px">調べた日:2026年11月16日。条例・手引き・保健所の案内から整理しました。洗髪設備の義務の有無は2014年時点の全国比較資料(川崎市議会)によります。設計の前に、必ずお店の住所の保健所へ図面を持って相談してください。</p></div>`;
+  }
   function viewKaigyo(id) {
+    if (id === 'rules') return viewKaigyoRules();
     const P = window.PREFS || [];
     const checked = esc(window.PREFS_CHECKED || '');
     const p = P.find(x => x.id === id);
@@ -362,7 +393,9 @@
         <div class="eyebrow">Opening guide</div><h1>都道府県別 開業ガイド</h1>
         <p class="muted">美容室を開くときの保健所の手続きと、使える起業支援金・補助金を都道府県ごとに調べました。<b>県の名前を押すと詳しい内容が見られます。</b></p>
         <div class="note tip">${icon('bulb')}<b>POINT</b>美容所の開設届は「お店の所在地」の保健所に出します。政令市・中核市などは市の保健所が窓口です。手数料は多くの県で16,000〜17,600円、東京の多くの区・市は24,000円前後です。</div>
+        <div class="kg-btns" style="margin:0 0 6px"><a class="btn gold sm" href="#/kaigyo/rules">間取り・広さの基準を全国で比べる${icon('arrow')}</a></div>
         ${regions.map(r => `<section class="section"><h2 style="margin:0 0 12px">${esc(r)}</h2><div class="pref-grid">${P.filter(x => x.region === r).map(x => `<a class="pref-btn" href="#/kaigyo/${x.id}">${esc(x.name)}</a>`).join('')}</div></section>`).join('')}
+        ${LAWS}
         <section class="section card pad"><div class="eyebrow">Nationwide</div><h2 style="margin:4px 0 10px">全国どこでも使える制度</h2>
           <ul class="kg-list"><li><b>小規模事業者持続化補助金(創業型)</b>:創業後1年以内。上限200万円・補助率2/3。商工会・商工会議所に相談</li>
           <li><b>日本政策金融公庫</b>:生活衛生貸付・新規開業資金(500万円を超える設備資金は、県の生活衛生営業指導センターの推薦書が必要)</li>
@@ -376,12 +409,13 @@
     const sub = x => `<div class="card pad kg-sub"><b>${esc(x.name)}</b><div class="kg-meta">${x.max && x.max !== '—' ? `<span>上限 ${esc(x.max)}</span>` : ''}${x.rate && x.rate !== '—' ? `<span>補助率 ${esc(x.rate)}</span>` : ''}</div><p class="small muted">${esc(x.org)}${x.period ? '/' + esc(x.period) : ''}</p>${x.url ? `<a class="btn sm" href="${esc(x.url)}" target="_blank" rel="noopener">${icon('ext')}公式ページ</a>` : ''}</div>`;
     return `<div class="fade" style="max-width:820px"><a class="back" href="#/kaigyo">${icon('arrow')}都道府県を選ぶ</a>
       <div class="eyebrow">${esc(p.region)}</div><h1>${esc(p.name)}の開業ガイド</h1>
-      <p class="muted">保健所の手続きと、${esc(p.name)}で使える起業支援金・補助金(${checked}調べ)。</p>
+      <p class="muted">保健所の手続き、間取り・構造の基準、${esc(p.name)}で使える起業支援金・補助金(${checked}調べ)。</p>
       <section class="section"><div class="section-head"><div><div class="eyebrow">Health center</div><h2>保健所の手続き</h2></div></div>
         <div class="card pad"><dl class="kg-dl"><dt>窓口</dt><dd>${esc(h.desk)}</dd><dt>手数料</dt><dd>${h.fee ? esc(h.fee) : '今回の調査では公式の金額を確認できませんでした。多くの県で16,000〜17,600円です。管轄の保健所に確認してください。'}</dd></dl>
         ${h.notes && h.notes.length ? `<ul class="kg-list">${h.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
         <div class="kg-btns">${h.url ? `<a class="btn sm" href="${esc(h.url)}" target="_blank" rel="noopener">${icon('ext')}公式の案内・手引き</a>` : ''}<a class="btn sm" href="${EXT.google(p.name + ' 美容所 開設届 保健所')}" target="_blank" rel="noopener">${icon('search')}最新情報を検索</a></div></div>
         <p class="small muted" style="margin-top:10px">共通の流れ:工事の前に図面で事前相談 → 開設届・手数料を提出 → 保健所の検査 → 確認済証が出てから営業開始。<a href="#/lesson/owner-procedures">手続きのレッスンを見る</a></p></section>
+      ${ruleBlock(p)}
       <section class="section"><div class="section-head"><div><div class="eyebrow">Subsidy</div><h2>${esc(short)}の起業支援金・補助金</h2></div></div>
         ${p.subs.length ? `<div class="grid c2">${p.subs.map(sub).join('')}</div>` : `<div class="card pad small muted">2026年度は、${esc(p.name)}が直接行う創業向けの補助金を確認できませんでした。市町村の制度と、全国共通の制度を使えます。</div>`}
         <div class="kg-btns" style="margin-top:12px"><a class="btn sm" href="${EXT.google(p.name + ' 創業 補助金 起業支援金')}" target="_blank" rel="noopener">${icon('search')}最新の募集を検索</a></div></section>
