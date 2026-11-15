@@ -81,6 +81,7 @@
     })() };
 
   D.perm = {
+    img: 'img/diagram/perm.jpg',
     cap: 'パーマ:1剤でS-S結合を切り、巻いた形のまま2剤でつなぎ直す',
     svg: (() => {
       const col = (x, title, sub, body) => `<g transform="translate(${x},0)">${body}<text x="70" y="250" text-anchor="middle" class="svg-txt g">${title}</text><text x="70" y="268" text-anchor="middle" class="svg-txt s">${sub}</text></g>`;
