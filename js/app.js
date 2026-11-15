@@ -13,7 +13,7 @@
 
   /* ── 保存(ブラウザ内のみ。失敗しても動くように) ── */
   const KEY = 'eclat.state';
-  let S = { track: null, field: 'hair', done: {}, quiz: {}, saved: [] };
+  let S = { track: null, field: 'hair', sub: 'makeup', done: {}, quiz: {}, saved: [] };
   try { S = Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } };
   function toast(msg) { const t = document.createElement('div'); t.className = 'toast fade'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2200); }
@@ -50,7 +50,10 @@
   /* ── ヘア/ビューティーの切り替え ── */
   const isBeauty = () => S.field === 'beauty';
   const fieldCats = () => CATS.filter(c => (c.field || 'hair') === (isBeauty() ? 'beauty' : 'hair'));
-  const fieldBar = () => `<div class="field-bar" role="group" aria-label="分野の切り替え"><button type="button" class="${isBeauty() ? '' : 'on'}" data-field="hair">${icon('scissors')}ヘア</button><button type="button" class="${isBeauty() ? 'on' : ''}" data-field="beauty">${icon('brush')}メイク・ネイル他</button></div>`;
+  const BCATS = () => CATS.filter(c => c.field === 'beauty');
+  const sub = () => (BCATS().some(c => c.id === S.sub) ? S.sub : 'makeup');
+  const setSub = c => { if (catField[c] === 'beauty' && (S.field !== 'beauty' || S.sub !== c)) { S.field = 'beauty'; S.sub = c; save(); } };
+  const fieldBar = () => `<div class="field-bar" role="group" aria-label="カテゴリーの切り替え"><button type="button" class="${isBeauty() ? '' : 'on'}" data-field="hair">${icon('scissors')}ヘア</button>${BCATS().map(c => `<button type="button" class="${isBeauty() && sub() === c.id ? 'on' : ''}" data-field="b:${c.id}">${icon(c.icon)}${esc(c.name)}</button>`).join('')}</div>`;
 
   /* ── 部品 ── */
   function lessonCard(l) {
@@ -121,37 +124,42 @@
       </div></div>`;
   }
   function viewHomeBeauty() {
-    const t = window.BEAUTY_TRACK;
+    const c = sub();
+    const t = Object.assign({}, window.BEAUTY_TRACK, { name: catName[c], path: LESSONS.filter(l => l.cat === c).map(l => l.id) });
     const path = t.path.map(id => byId[id]).filter(Boolean);
     const next = path.find(l => !S.done[l.id]) || path[0];
     const doneCount = path.filter(l => S.done[l.id]).length;
     return `${fieldBar()}<section class="hero fade"><div class="hero-img">${illust(next.illust, '')}</div><div class="hero-in">
         <span class="eyebrow">${esc(t.en)} course</span><h1>${esc(t.name)}</h1><p>${esc(t.lead)}</p>
         <a class="btn gold" href="#/lesson/${next.id}">${S.done[next.id] ? '復習する' : '次のレッスン'}:${esc(next.title)}</a>
-        <div class="stat-row"><div class="stat"><b>${pathProgress(t)}%</b><span>コース進み具合</span></div><div class="stat"><b>${doneCount}</b><span>読んだレッスン</span></div><div class="stat"><b>${fieldCats().length}</b><span>分野</span></div></div>
+        <div class="stat-row"><div class="stat"><b>${pathProgress(t)}%</b><span>コース進み具合</span></div><div class="stat"><b>${doneCount}</b><span>読んだレッスン</span></div><div class="stat"><b>${path.length}</b><span>レッスン数</span></div></div>
       </div></section>
       <div class="home-cols"><div>
-        <section class="section"><div class="section-head"><div><div class="eyebrow">Your path</div><h2>学ぶ順番</h2></div><a href="#/learn">すべてのレッスン</a></div>
+        <section class="section"><div class="section-head"><div><div class="eyebrow">Your path</div><h2>学ぶ順番</h2></div><a href="#/learn/${c}">一覧で見る</a></div>
           <div class="path">${path.map((l, i) => `<a class="path-item ${S.done[l.id] ? 'done' : ''}" href="#/lesson/${l.id}"><span class="path-no">${S.done[l.id] ? icon('check') : i + 1}</span><span class="t"><b>${esc(l.title)}</b><span>${esc(catName[l.cat])} · ${l.min}分</span></span></a>`).join('')}</div></section>
       </div><div>
         <section class="section"><div class="section-head"><div><div class="eyebrow">Categories</div><h2>分野から選ぶ</h2></div></div>
           <div class="catgrid">${fieldCats().map(c => `<a class="cat" href="#/learn/${c.id}">${icon(c.icon)}<b>${c.name}</b><span>${c.en}</span></a>`).join('')}</div></section>
+        ${(() => { const up = UPDATES.find(u => catTrends(u, c).length); const l = catTrends(up, c); return l.length ? `<section class="section"><div class="section-head"><div><div class="eyebrow">Trend</div><h2>${esc(catName[c])}の最新トレンド</h2></div><a href="#/trends/c-${c}">すべて見る</a></div><div class="grid">${l.slice(0, 2).map(trendCard).join('')}</div></section>` : ''; })()}
         <section class="section card pad"><div class="eyebrow">Watch</div><h2 style="margin:4px 0 8px">動画で見る</h2><p class="muted small" style="margin:0 0 14px">メイク・ネイル・まつ毛の新しい動画をYouTubeで探せます。</p><a class="btn gold" href="#/videos">動画を探す</a></section>
       </div></div>`;
   }
   const monthLabel = m => { const [y, mo] = m.split('-'); return `${y}年${+mo}月`; };
-  const kindLabel = k => ({ style: 'ヘアスタイル', color: 'カラー', technique: '技術', business: '業界', makeup: 'メイク', nail: 'ネイル' }[k] || 'トレンド');
+  const kindLabel = k => ({ style: 'ヘアスタイル', color: 'カラー', technique: '技術', business: '業界', makeup: 'メイク', nail: 'ネイル', lash: 'まつ毛・眉', skin: 'スキンケア', kitsuke: '着付け・ブライダル' }[k] || 'トレンド');
 
   /* ── 画面:学ぶ ── */
   function viewLearn(cat) {
     const t = S.track;
-    if (cat && catField[cat] && catField[cat] !== S.field) { S.field = catField[cat]; save(); }
+    if (cat && catField[cat] === 'beauty') setSub(cat);
+    else if (cat && catField[cat] && catField[cat] !== S.field) { S.field = catField[cat]; save(); }
+    if (isBeauty() && !cat) cat = sub();
     const fc = fieldCats(), fids = fc.map(c => c.id);
     const list = LESSONS.filter(l => fids.includes(l.cat)).filter(l => !cat || cat === 'mine' ? (cat === 'mine' ? l.tracks.includes(t) : true) : l.cat === cat);
-    return `<div class="fade">${fieldBar()}<div class="eyebrow">Lessons</div><h1>学ぶ${isBeauty() ? ':メイク・ネイル他' : ''}</h1>
+    return `<div class="fade">${fieldBar()}<div class="eyebrow">Lessons</div><h1>学ぶ${isBeauty() ? ':' + esc(catName[cat]) : ''}</h1>
       <p class="muted">${isBeauty() ? 'メイク・ネイル・まつ毛・スキンケア・着付けを、ヘアとは別枠でまとめています。' : '図解と動画で、ひとつずつ。'}読み終えたら「読んだ」を押すと進み具合に反映されます。</p>
-      <div class="chips" style="margin:18px 0 22px"><a class="chip ${!cat ? 'on' : ''}" href="#/learn">すべて</a>${isBeauty() ? '' : `<a class="chip ${cat === 'mine' ? 'on' : ''}" href="#/learn/mine">${esc((TRACKS[t] || {}).name || 'マイコース')}向け</a>`}${fc.map(c => `<a class="chip ${cat === c.id ? 'on' : ''}" href="#/learn/${c.id}">${c.name}</a>`).join('')}</div>
+      ${isBeauty() ? '<div style="height:18px"></div>' : `<div class="chips" style="margin:18px 0 22px"><a class="chip ${!cat ? 'on' : ''}" href="#/learn">すべて</a>${`<a class="chip ${cat === 'mine' ? 'on' : ''}" href="#/learn/mine">${esc((TRACKS[t] || {}).name || 'マイコース')}向け</a>`}${fc.map(c => `<a class="chip ${cat === c.id ? 'on' : ''}" href="#/learn/${c.id}">${c.name}</a>`).join('')}</div>`}
       ${!cat ? `<div class="catgrid" style="margin-bottom:28px">${fc.map(c => `<a class="cat" href="#/learn/${c.id}">${icon(c.icon)}<b>${c.name}</b><span>${c.en}</span></a>`).join('')}</div>` : ''}
+      ${(() => { if (!cat || cat === 'mine') return ''; const up = UPDATES.find(u => catTrends(u, cat).length); const l = catTrends(up, cat); return l.length ? `<section class="section" style="margin-top:0"><div class="section-head"><div><div class="eyebrow">Trend · ${monthLabel(up.month)}</div><h2>${esc(catName[cat])}の最新トレンド</h2></div><a href="#/trends/c-${cat}/${up.month}">すべて見る</a></div><div class="grid c2">${l.slice(0, 2).map(trendCard).join('')}</div></section>` : ''; })()}
       <div class="grid c3">${list.map(lessonCard).join('')}</div>
       ${isBeauty() ? '' : `<section class="section card pad"><div class="eyebrow">License exam</div><h2 style="margin:4px 0 8px">国家試験クイズ</h2><p class="muted small" style="margin:0 0 14px">学科5科目の練習問題(オリジナル)。</p><a class="btn gold" href="#/quiz">科目を選ぶ</a></section>`}</div>`;
   }
@@ -178,7 +186,7 @@
   }
   function viewLesson(id) {
     const l = byId[id]; if (!l) return `<div class="empty">レッスンが見つかりません。<br><a href="#/learn">一覧へ</a></div>`;
-    if (catField[l.cat] !== S.field) { S.field = catField[l.cat]; save(); }
+    if (catField[l.cat] === 'beauty') setSub(l.cat); else if (catField[l.cat] !== S.field) { S.field = catField[l.cat]; save(); }
     const vids = l.blocks.filter(b => b.video).map(b => vById[b.video]).filter(Boolean);
     const related = LESSONS.filter(x => x.cat === l.cat && x.id !== l.id).slice(0, 3);
     const saved = S.saved.includes(l.id);
@@ -201,11 +209,16 @@
 
   /* ── 画面:動画 ── */
   const VCATS = [['', 'すべて'], ['trend', 'トレンド'], ['exam', '国家試験'], ['shampoo', 'シャンプー'], ['dry', 'ドライ'], ['cut', 'カット'], ['color', 'カラー'], ['perm', 'パーマ'], ['set', 'ヘアセット'], ['service', '接客']];
-  const BVIDS = [['メイク', 'ベースメイク やり方'], ['アイメイク', 'アイシャドウ 塗り方 基本'], ['眉', '眉毛 書き方 整え方'], ['メンズ美容', 'メンズ 眉 スキンケア'], ['ネイル', 'ネイルケア やり方 甘皮'], ['ジェルネイル', 'ジェルネイル やり方 初心者'], ['まつ毛エクステ', 'まつげエクステ 施術 基本'], ['まつ毛パーマ', 'まつげパーマ 施術'], ['スキンケア', 'スキンケア 順番 基本'], ['着付け', '振袖 着付け 手順'], ['ブライダル', 'ブライダル ヘアメイク']];
+  const BVIDS = [['makeup', 'ベースメイク', 'ベースメイク やり方'], ['makeup', 'アイメイク', 'アイシャドウ 塗り方 基本'], ['makeup', 'メンズ美容', 'メンズ 眉 スキンケア'], ['makeup', 'パーソナルカラー', 'パーソナルカラー メイク 似合う色'],
+    ['nail', 'ネイルケア', 'ネイルケア やり方 甘皮'], ['nail', 'ジェルネイル', 'ジェルネイル やり方 初心者'], ['nail', 'ネイリスト検定', 'ネイリスト技能検定 3級'],
+    ['lash', '眉の整え方', '眉毛 書き方 整え方'], ['lash', 'まつ毛エクステ', 'まつげエクステ 施術 基本'], ['lash', 'まつ毛パーマ', 'まつげパーマ 施術'],
+    ['skin', 'スキンケア', 'スキンケア 順番 基本'], ['skin', 'フェイシャル', 'フェイシャル マッサージ やり方'],
+    ['kitsuke', '振袖の着付け', '振袖 着付け 手順'], ['kitsuke', '浴衣の着付け', '浴衣 着付け 手順'], ['kitsuke', 'ブライダルヘアメイク', 'ブライダル ヘアメイク'],
+    ['bcareer', 'アイリストの仕事', 'アイリスト 仕事 1日'], ['bcareer', 'ヘアメイクの仕事', 'ヘアメイクアーティスト 仕事']];
   function viewVideos(cat) {
-    if (isBeauty()) return `<div class="fade">${fieldBar()}<div class="eyebrow">Video library</div><h1>動画で学ぶ:メイク・ネイル他</h1>
+    if (isBeauty()) return `<div class="fade">${fieldBar()}<div class="eyebrow">Video library</div><h1>動画で学ぶ:${esc(catName[sub()])}</h1>
       <p class="muted">テーマを選ぶと、YouTubeの新しい動画を検索して開きます。</p>
-      <div class="grid c3" style="margin-top:20px">${BVIDS.map(([n, q]) => `<a class="card ext" href="${EXT.yt(q)}" target="_blank" rel="noopener">${icon('yt')}<span><b>${n}</b><span>${esc(q)} の新着動画</span></span></a>`).join('')}</div></div>`;
+      <div class="grid c3" style="margin-top:20px">${BVIDS.filter(v => v[0] === sub()).map(([, n, q]) => `<a class="card ext" href="${EXT.yt(q)}" target="_blank" rel="noopener">${icon('yt')}<span><b>${n}</b><span>${esc(q)} の新着動画</span></span></a>`).join('')}</div></div>`;
     const list = VIDEOS.filter(v => !cat || v.cat === cat);
     return `<div class="fade">${fieldBar()}<div class="eyebrow">Video library</div><h1>動画で学ぶ</h1>
       <p class="muted">YouTubeの解説動画を分野別に。アプリの中でそのまま再生できます。</p>
@@ -217,12 +230,18 @@
   /* ── 画面:トレンド ── */
   const TTABS = [['trends', 'トレンド'], ['instagram', 'Instagramまとめ'], ['techniques', '新しい技術'], ['exam', '国家試験'], ['salonWork', '業界・働き方'], ['styles', 'スタイル図鑑']];
   function viewTrends(tab, month) {
+    const tcat = tab && tab.startsWith('c-') ? tab.slice(2) : null;
+    if (tcat && catField[tcat] && catField[tcat] !== S.field) { S.field = catField[tcat]; save(); }
     if (tab === 'beauty' && !isBeauty()) { S.field = 'beauty'; save(); }
-    if (isBeauty()) return viewTrendsBeauty(month);
+    if (tcat && catField[tcat] === 'beauty') setSub(tcat);
+    if (isBeauty()) return viewTrendsBeauty(month, tcat);
     tab = tab || 'trends';
     const up = UPDATES.find(u => u.month === month) || UPDATES[0];
     let body = '';
-    if (tab === 'styles') {
+    if (tcat) {
+      const l = catTrends(up, tcat);
+      body = l.length ? `<h2 style="margin:20px 0 12px">${esc(catName[tcat] || '')}のトレンド</h2><div class="grid c2">${l.map(trendCard).join('')}</div>` : '<div class="empty">このカテゴリのトレンドはまだありません。</div>';
+    } else if (tab === 'styles') {
       const L = { veryshort: 'ベリーショート', short: 'ショート', bob: 'ボブ', medium: 'ミディアム', semi: 'セミロング', long: 'ロング' };
       body = Object.keys(L).map(k => { const st = window.STYLES.filter(s => s.len === k); return st.length ? `<h2 style="margin:26px 0 12px">${L[k]}</h2><div class="stylegrid">${st.map(s => `<button class="card style" data-style="${s.id}"><img src="img/styles/${s.id}.jpg" alt="${esc(s.name)}のイラスト" loading="lazy"><div class="sb"><b>${esc(s.name)}</b><span>${esc(s.en)}</span></div></button>`).join('')}</div>` : ''; }).join('');
     } else if (!up) {
@@ -247,19 +266,28 @@
     return `<div class="fade">${fieldBar()}<div class="eyebrow">Monthly update${up ? ' · ' + monthLabel(up.month) : ''}</div><h1>トレンドと新しい技術</h1>
       <p class="muted">ネット・YouTube・Instagramの話題を毎月まとめて更新しています。${up && up.updated ? `最終更新 ${esc(up.updated)}` : ''}</p>
       ${UPDATES.length > 1 ? `<div class="chips" style="margin-top:12px">${UPDATES.map(u => `<a class="chip ${u === up ? 'on' : ''}" href="#/trends/${tab}/${u.month}">${monthLabel(u.month)}</a>`).join('')}</div>` : ''}
-      <div class="chips" style="margin:14px 0 22px">${TTABS.map(([k, n]) => `<a class="chip ${tab === k ? 'on' : ''}" href="#/trends/${k}${up ? '/' + up.month : ''}">${n}</a>`).join('')}</div>${body}</div>`;
+      <div class="chips" style="margin:14px 0 4px">${TTABS.map(([k, n]) => `<a class="chip ${tab === k ? 'on' : ''}" href="#/trends/${k}${up ? '/' + up.month : ''}">${n}</a>`).join('')}</div>${catChips(up, tcat)}<div style="height:16px"></div>${body}</div>`;
   }
-  function viewTrendsBeauty(month) {
-    const ups = UPDATES.filter(u => u.beauty && u.beauty.length);
-    const up = ups.find(u => u.month === month) || ups[0];
-    const card = t => `<article class="card trend"><span class="tag">${kindLabel(t.kind)}</span><h3>${esc(t.title)}</h3><p>${esc(t.summary)}</p>
+  const TSRC = { trends: 'トレンド', techniques: '新しい技術', salonWork: '業界・働き方', beauty: 'トレンド' };
+  const catTrends = (up, cat) => up ? ['trends', 'techniques', 'salonWork', 'beauty'].flatMap(k => (up[k] || []).map(t => ({ ...t, src: k }))).filter(t => t.cat === cat) : [];
+  function trendCard(t) {
+    const tag = t.src === 'techniques' || t.src === 'salonWork' ? TSRC[t.src] : kindLabel(t.kind);
+    const q = t.title.replace(/[（(].*?[）)]/g, '');
+    return `<article class="card trend"><span class="tag">${esc(tag)}</span><h3>${esc(t.title)}</h3><p>${esc(t.summary)}</p>
         ${t.points && t.points.length ? `<ul class="pts">${t.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}${hashtags(t.hashtags)}
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn sm" href="${EXT.yt(t.title.replace(/[（(].*?[）)]/g, ''))}" target="_blank" rel="noopener">${icon('yt')}動画</a><a class="btn sm" href="${EXT.ig((t.hashtags || [t.title])[0])}" target="_blank" rel="noopener">${icon('ig')}Instagram</a></div>${srcs(t.sources)}</article>`;
-    const sec = (k, n) => { const l = (up.beauty || []).filter(t => t.kind === k); return l.length ? `<h2 style="margin:26px 0 12px">${n}</h2><div class="grid c2">${l.map(card).join('')}</div>` : ''; };
-    return `<div class="fade">${fieldBar()}<div class="eyebrow">Monthly update${up ? ' · ' + monthLabel(up.month) : ''}</div><h1>メイク・ネイルのトレンド</h1>
-      <p class="muted">美容メディアやサロンの公開情報から、メイクとネイルの話題をまとめています。${up && up.updated ? `最終更新 ${esc(up.updated)}` : ''}</p>
-      ${ups.length > 1 ? `<div class="chips" style="margin-top:12px">${ups.map(u => `<a class="chip ${u === up ? 'on' : ''}" href="#/trends/beauty/${u.month}">${monthLabel(u.month)}</a>`).join('')}</div>` : ''}
-      ${up ? sec('makeup', 'メイク') + sec('nail', 'ネイル') : '<div class="empty">まだメイク・ネイルのトレンドはありません。</div>'}</div>`;
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn sm" href="${EXT.yt(q)}" target="_blank" rel="noopener">${icon('yt')}動画</a><a class="btn sm" href="${EXT.ig((t.hashtags || [q])[0])}" target="_blank" rel="noopener">${icon('ig')}Instagram</a></div>${srcs(t.sources)}</article>`;
+  }
+  const catChips = (up, cur) => { const cs = fieldCats().filter(c => catTrends(up, c.id).length); return cs.length ? `<div class="chips" style="margin:6px 0 4px"><span class="small muted" style="align-self:center;margin-right:4px">カテゴリ別</span>${cs.map(c => `<a class="chip ${cur === c.id ? 'on' : ''}" href="#/trends/c-${c.id}${up ? '/' + up.month : ''}">${c.name} ${catTrends(up, c.id).length}</a>`).join('')}</div>` : ''; };
+  function viewTrendsBeauty(month, cat) {
+    cat = cat || sub(); setSub(cat);
+    const ups = UPDATES.filter(u => catTrends(u, cat).length);
+    const up = ups.find(u => u.month === month) || ups[0];
+    const sec = c => { const l = catTrends(up, c.id); return l.length ? `<h2 style="margin:26px 0 12px">${esc(c.name)}</h2><div class="grid c2">${l.map(trendCard).join('')}</div>` : ''; };
+    const shown = fieldCats().filter(c => !cat || c.id === cat);
+    return `<div class="fade">${fieldBar()}<div class="eyebrow">Monthly update${up ? ' · ' + monthLabel(up.month) : ''}</div><h1>${esc(catName[cat])}のトレンド</h1>
+      <p class="muted">美容メディアやサロンの公開情報から、カテゴリーごとに話題をまとめています。上のボタンでカテゴリーを切り替えられます。${up && up.updated ? `最終更新 ${esc(up.updated)}` : ''}</p>
+      ${ups.length > 1 ? `<div class="chips" style="margin-top:12px">${ups.map(u => `<a class="chip ${u === up ? 'on' : ''}" href="#/trends/c-${cat}/${u.month}">${monthLabel(u.month)}</a>`).join('')}</div>` : ''}
+      ${up ? shown.map(sec).join('') : '<div class="empty">このカテゴリーのトレンドはまだありません。毎週の更新で追加していきます。</div>'}</div>`;
   }
   function openStyle(id) {
     const s = window.STYLES.find(x => x.id === id); if (!s) return;
@@ -383,6 +411,7 @@
     $('#view').innerHTML = html;
     renderNav(name);
     window.scrollTo(0, 0);
+    const fb = $('.field-bar'), fo = fb && fb.querySelector('.on'); if (fo) fb.scrollLeft = fo.offsetLeft - (fb.clientWidth - fo.offsetWidth) / 2;
     document.title = 'ÉCLAT 美容師の学び';
   }
 
@@ -390,7 +419,13 @@
     const t = e.target.closest('[data-play],[data-style],[data-done],[data-save],[data-ans],[data-next],[data-retry],[data-theme],[data-reset],[data-reonboard],[data-field]');
     if (!t) return;
     const d = t.dataset;
-    if (d.field) { S.field = d.field; save(); const n = location.hash.slice(2).split('/')[0]; if ((n === 'learn' || n === 'videos' || n === 'trends') && location.hash !== '#/' + n) location.hash = '#/' + n; else route(); }
+    if (d.field) {
+      const b = d.field.startsWith('b:') ? d.field.slice(2) : null;
+      S.field = b ? 'beauty' : 'hair'; if (b) S.sub = b; save();
+      const n = location.hash.slice(2).split('/')[0];
+      const to = n === 'learn' ? (b ? '#/learn/' + b : '#/learn') : n === 'trends' ? (b ? '#/trends/c-' + b : '#/trends') : n === 'videos' ? '#/videos' : null;
+      if (to && location.hash !== to) location.hash = to; else route();
+    }
     else if (d.play) playVideo(d.play);
     else if (d.style) openStyle(d.style);
     else if (d.done) { if (S.done[d.done]) delete S.done[d.done]; else S.done[d.done] = Date.now(); save(); toast(S.done[d.done] ? '読んだレッスンに追加しました' : '取り消しました'); route(); }

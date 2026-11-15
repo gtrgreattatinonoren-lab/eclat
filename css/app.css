@@ -326,7 +326,8 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 .trk { text-align: left; }
 
 /* ヘア/ビューティー切り替え */
-.field-bar { display: flex; width: fit-content; max-width: 100%; gap: 4px; margin: 0 0 20px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line2); }
-.field-bar button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 999px; font-size: 13px; color: var(--muted); letter-spacing: .06em; }
+.field-bar { display: flex; width: fit-content; max-width: 100%; gap: 4px; margin: 0 0 20px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line2); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.field-bar::-webkit-scrollbar { display: none; }
+.field-bar button { flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 999px; font-size: 13px; color: var(--muted); letter-spacing: .06em; }
 .field-bar button .icon { width: 16px; height: 16px; }
 .field-bar button.on { background: var(--gold); color: #1a1508; font-weight: 600; }
