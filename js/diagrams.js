@@ -114,5 +114,7 @@
 
   D.brow = { imgs: [{ label: '女性', src: 'img/diagram/brow-f.jpg' }, { label: '男性', src: 'img/diagram/brow-m.jpg' }], cap: '眉の黄金比:眉頭・眉山・眉尻の位置の目安' };
 
+  D.nail = { img: 'img/diagram/nail.jpg', cap: '爪の構造:見える部分(フリーエッジ・ネイルプレート・ルヌーラ・甘皮)と見えない部分' };
+
   window.DIAGRAMS = D;
 })();
