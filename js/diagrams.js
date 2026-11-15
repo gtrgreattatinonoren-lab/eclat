@@ -108,5 +108,7 @@
   D.blocking = { img: 'img/diagram/blocking.jpg', cap: 'カラー塗布の4ブロック(真上から見た図)と塗る順番の例' };
   D.fade = { img: 'img/diagram/fade.jpg', cap: 'フェード:下から上へ少しずつ長くして境目をぼかす(ミリ数は一例)' };
 
+  D.skin = { img: 'img/diagram/skin.jpg', cap: '皮膚の構造(表皮・真皮・皮下組織と毛・皮脂腺・汗腺)' };
+
   window.DIAGRAMS = D;
 })();
