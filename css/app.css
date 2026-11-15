@@ -324,3 +324,9 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 .noimg { background: radial-gradient(80% 120% at 85% 10%, color-mix(in srgb, var(--gold) 26%, transparent), transparent 60%), repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--gold) 7%, transparent) 14px 15px), var(--surface2); }
 .lesson > *, .home-cols > *, .grid > * { min-width: 0; }
 .trk { text-align: left; }
+
+/* ヘア/ビューティー切り替え */
+.field-bar { display: flex; width: fit-content; max-width: 100%; gap: 4px; margin: 0 0 20px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line2); }
+.field-bar button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 999px; font-size: 13px; color: var(--muted); letter-spacing: .06em; }
+.field-bar button .icon { width: 16px; height: 16px; }
+.field-bar button.on { background: var(--gold); color: #1a1508; font-weight: 600; }
