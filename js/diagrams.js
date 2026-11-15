@@ -112,5 +112,7 @@
 
   D.iron = { imgs: [{ label: '女性', src: 'img/diagram/iron-f.jpg' }, { label: '男性', src: 'img/diagram/iron-m.jpg' }], cap: 'コテの巻き方向:フォワード巻き(顔の方へ)とリバース巻き(顔の外へ)' };
 
+  D.brow = { imgs: [{ label: '女性', src: 'img/diagram/brow-f.jpg' }, { label: '男性', src: 'img/diagram/brow-m.jpg' }], cap: '眉の黄金比:眉頭・眉山・眉尻の位置の目安' };
+
   window.DIAGRAMS = D;
 })();
