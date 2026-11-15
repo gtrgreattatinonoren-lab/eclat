@@ -277,7 +277,7 @@
         ${t.points && t.points.length ? `<ul class="pts">${t.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}${hashtags(t.hashtags)}
         <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn sm" href="${EXT.yt(q)}" target="_blank" rel="noopener">${icon('yt')}動画</a><a class="btn sm" href="${EXT.ig((t.hashtags || [q])[0])}" target="_blank" rel="noopener">${icon('ig')}Instagram</a></div>${srcs(t.sources)}</article>`;
   }
-  const catChips = (up, cur) => { const cs = fieldCats().filter(c => catTrends(up, c.id).length); return cs.length ? `<div class="chips" style="margin:6px 0 4px"><span class="small muted" style="align-self:center;margin-right:4px">カテゴリ別</span>${cs.map(c => `<a class="chip ${cur === c.id ? 'on' : ''}" href="#/trends/c-${c.id}${up ? '/' + up.month : ''}">${c.name} ${catTrends(up, c.id).length}</a>`).join('')}</div>` : ''; };
+  const catChips = (up, cur) => { const cs = fieldCats().filter(c => catTrends(up, c.id).length); return cs.length ? `<div class="chips" style="margin:6px 0 4px"><span class="chip-label">カテゴリ別</span>${cs.map(c => `<a class="chip ${cur === c.id ? 'on' : ''}" href="#/trends/c-${c.id}${up ? '/' + up.month : ''}">${c.name} ${catTrends(up, c.id).length}</a>`).join('')}</div>` : ''; };
   function viewTrendsBeauty(month, cat) {
     cat = cat || sub(); setSub(cat);
     const ups = UPDATES.filter(u => catTrends(u, cat).length);

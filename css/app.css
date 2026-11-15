@@ -108,9 +108,10 @@ h3 { font-size: 16px; }
 .btn.gold { background: linear-gradient(135deg, var(--gold2), var(--gold) 55%, var(--gold3)); color: #1a1508; border: 0; font-weight: 600; }
 .btn.gold:hover { filter: brightness(1.06); }
 .btn.sm { padding: 7px 14px; font-size: 12px; }
-.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chips { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chip-label { flex: none; white-space: nowrap; font-size: 12px; color: var(--muted); letter-spacing: .08em; margin-right: 2px; }
 .chips::-webkit-scrollbar { display: none; }
-.chip { flex: none; padding: 7px 15px; border-radius: 999px; font-size: 12.5px; letter-spacing: .08em; border: 1px solid var(--line); color: var(--muted); background: var(--surface); }
+.chip { flex: none; white-space: nowrap; padding: 7px 15px; border-radius: 999px; font-size: 12.5px; letter-spacing: .08em; border: 1px solid var(--line); color: var(--muted); background: var(--surface); }
 .chip.on { color: #1a1508; background: var(--gold); border-color: var(--gold); font-weight: 600; }
 .tag { display: inline-block; font-size: 10.5px; letter-spacing: .12em; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line2); color: var(--gold2); }
 .grid { display: grid; gap: 14px; }
