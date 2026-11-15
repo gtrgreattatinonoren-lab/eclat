@@ -110,5 +110,7 @@
 
   D.skin = { img: 'img/diagram/skin.jpg', cap: '皮膚の構造(表皮・真皮・皮下組織と毛・皮脂腺・汗腺)' };
 
+  D.iron = { imgs: [{ label: '女性', src: 'img/diagram/iron-f.jpg' }, { label: '男性', src: 'img/diagram/iron-m.jpg' }], cap: 'コテの巻き方向:フォワード巻き(顔の方へ)とリバース巻き(顔の外へ)' };
+
   window.DIAGRAMS = D;
 })();
