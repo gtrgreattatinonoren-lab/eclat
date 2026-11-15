@@ -99,5 +99,10 @@
         ${col(316, '③ 2剤(酸化)', 'カールの形でつなぎ直す', curl)}</svg>`;
     })() };
 
+  D.scissors = { img: 'img/diagram/scissors.jpg', cap: 'シザーズの各部の名前(親指で動かすのが動刃、薬指側が静刃)' };
+  D.levels = { img: 'img/diagram/levels.jpg', cap: '明るくするにつれて出てくる色(アンダーカラー)と、打ち消す補色' };
+  D.rodbase = { img: 'img/diagram/rodbase.jpg', cap: 'ロッドの位置(オンベース/ハーフオフ/オフベース)と根元の立ち上がり' };
+  D.haircycle = { img: 'img/diagram/haircycle.jpg', cap: '毛周期:成長期 → 退行期 → 休止期 をくり返す' };
+
   window.DIAGRAMS = D;
 })();
