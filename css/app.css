@@ -207,6 +207,9 @@ td:first-child { white-space: nowrap; color: var(--ivory); }
 .diagram-line summary { cursor: pointer; text-align: center; color: var(--gold, #c9a96e); list-style: none; }
 .diagram-line summary::-webkit-details-marker { display: none; }
 .diagram-line[open] summary { margin-bottom: 10px; }
+.dg-switch { display: flex; width: fit-content; gap: 4px; margin: 12px auto; padding: 4px; border-radius: 999px; background: rgba(13,12,10,.72); border: 1px solid rgba(201,169,110,.45); }
+.dg-switch button { font: inherit; font-size: 12px; padding: 5px 14px; border-radius: 999px; border: 0; background: transparent; color: #e5d2a4; cursor: pointer; }
+.dg-switch button.on { background: #c9a96e; color: #0d0c0a; font-weight: 600; }
 .svg-line { stroke: var(--gold); fill: none; stroke-width: 1.4; }
 .svg-soft { stroke: var(--line2); fill: none; stroke-width: 1; }
 .svg-dot { fill: var(--gold2); }

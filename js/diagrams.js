@@ -10,6 +10,7 @@
   const D = {};
 
   D.headpoints = {
+    imgs: [{ label: '女性', src: 'img/diagram/headpoints-f.jpg' }, { label: '男性', src: 'img/diagram/headpoints-m.jpg' }],
     cap: '横から見た頭のおおよその位置(FSP・SP・EP・EBP・NSPは左右に1つずつある)',
     svg: `<svg viewBox="0 0 540 330" role="img" aria-label="頭部のポイントの図">
       <path class="svg-line" d="M107,130 A115,115 0 1 1 291,241 L286,318"/>

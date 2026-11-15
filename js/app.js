@@ -139,7 +139,11 @@
     if (b.ng) return `<div class="note ng">${icon('alert')}<b>CAUTION</b>${esc(b.ng)}</div>`;
     if (b.diagram && window.DIAGRAMS[b.diagram]) {
       const d = window.DIAGRAMS[b.diagram];
-      if (d.img) return `<figure class="diagram has-img"><img src="${d.img}" alt="${esc(d.cap)}" loading="lazy" onerror="this.parentNode.classList.remove('has-img');this.remove()"><figcaption>${esc(d.cap)}</figcaption><details class="diagram-line"><summary>線の図でも見る</summary>${d.svg}</details></figure>`;
+      const imgs = d.imgs || (d.img ? [{ src: d.img }] : null);
+      if (imgs) {
+        const sw = imgs.length > 1 ? `<div class="dg-switch" role="group" aria-label="イラストの切り替え">${imgs.map((m, i) => `<button type="button" class="${i ? '' : 'on'}" data-src="${m.src}" onclick="var f=this.closest('figure');f.querySelector('img').src=this.dataset.src;f.querySelectorAll('.dg-switch button').forEach(function(b){b.classList.toggle('on',b===this)},this)">${esc(m.label)}</button>`).join('')}</div>` : '';
+        return `<figure class="diagram has-img">${sw}<img src="${imgs[0].src}" alt="${esc(d.cap)}" loading="lazy" onerror="this.parentNode.classList.remove('has-img');this.remove()"><figcaption>${esc(d.cap)}</figcaption><details class="diagram-line"><summary>線の図でも見る</summary>${d.svg}</details></figure>`;
+      }
       return `<figure class="diagram">${d.svg}<figcaption>${esc(d.cap)}</figcaption></figure>`;
     }
     return '';
