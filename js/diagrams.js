@@ -29,6 +29,7 @@
     </svg>` };
 
   D.hairlayers = {
+    img: 'img/diagram/hairlayers.jpg',
     cap: '毛髪の断面(外から キューティクル → コルテックス → メデュラ)',
     svg: `<svg viewBox="0 0 500 220" role="img" aria-label="毛髪の断面図">
       <circle cx="120" cy="110" r="92" class="svg-line" stroke-width="10" opacity=".55"/>

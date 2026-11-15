@@ -137,7 +137,11 @@
     if (b.table) return `<div class="tablewrap"><table><thead><tr>${b.table.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.table.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
     if (b.tip) return `<div class="note tip">${icon('bulb')}<b>POINT</b>${esc(b.tip)}</div>`;
     if (b.ng) return `<div class="note ng">${icon('alert')}<b>CAUTION</b>${esc(b.ng)}</div>`;
-    if (b.diagram && window.DIAGRAMS[b.diagram]) { const d = window.DIAGRAMS[b.diagram]; return `<figure class="diagram">${d.svg}<figcaption>${esc(d.cap)}</figcaption></figure>`; }
+    if (b.diagram && window.DIAGRAMS[b.diagram]) {
+      const d = window.DIAGRAMS[b.diagram];
+      if (d.img) return `<figure class="diagram has-img"><img src="${d.img}" alt="${esc(d.cap)}" loading="lazy" onerror="this.parentNode.classList.remove('has-img');this.remove()"><figcaption>${esc(d.cap)}</figcaption><details class="diagram-line"><summary>線の図でも見る</summary>${d.svg}</details></figure>`;
+      return `<figure class="diagram">${d.svg}<figcaption>${esc(d.cap)}</figcaption></figure>`;
+    }
     return '';
   }
   function viewLesson(id) {
