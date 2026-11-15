@@ -104,5 +104,9 @@
   D.rodbase = { img: 'img/diagram/rodbase.jpg', cap: 'ロッドの位置(オンベース/ハーフオフ/オフベース)と根元の立ち上がり' };
   D.haircycle = { img: 'img/diagram/haircycle.jpg', cap: '毛周期:成長期 → 退行期 → 休止期 をくり返す' };
 
+  D.slices = { imgs: [{ label: '女性', src: 'img/diagram/slice-f.jpg' }, { label: '男性', src: 'img/diagram/slice-m.jpg' }], cap: 'スライス(毛束を分け取る線)の種類と、仕上がりのライン' };
+  D.blocking = { img: 'img/diagram/blocking.jpg', cap: 'カラー塗布の4ブロック(真上から見た図)と塗る順番の例' };
+  D.fade = { img: 'img/diagram/fade.jpg', cap: 'フェード:下から上へ少しずつ長くして境目をぼかす(ミリ数は一例)' };
+
   window.DIAGRAMS = D;
 })();
