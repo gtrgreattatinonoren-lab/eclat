@@ -177,8 +177,8 @@
       const d = window.DIAGRAMS[b.diagram];
       const imgs = d.imgs || (d.img ? [{ src: d.img }] : null);
       if (imgs) {
-        const sw = imgs.length > 1 ? `<div class="dg-switch" role="group" aria-label="イラストの切り替え">${imgs.map((m, i) => `<button type="button" class="${i ? '' : 'on'}" data-src="${m.src}" onclick="var f=this.closest('figure');f.querySelector('img').src=this.dataset.src;f.querySelectorAll('.dg-switch button').forEach(function(b){b.classList.toggle('on',b===this)},this)">${esc(m.label)}</button>`).join('')}</div>` : '';
-        return `<figure class="diagram has-img">${sw}<img src="${imgs[0].src}" alt="${esc(d.cap)}" loading="lazy" onerror="this.parentNode.classList.remove('has-img');this.remove()"><figcaption>${esc(d.cap)}</figcaption>${d.svg ? `<details class="diagram-line"><summary>線の図でも見る</summary>${d.svg}</details>` : ''}</figure>`;
+        const sw = imgs.length > 1 ? `<div class="dg-switch" role="group" aria-label="イラストの切り替え">${imgs.map((m, i) => `<button type="button" class="${i ? '' : 'on'}" data-dg="${i}" aria-pressed="${i ? 'false' : 'true'}">${esc(m.label)}</button>`).join('')}</div>` : '';
+        return `<figure class="diagram has-img">${sw}${imgs.map((m, i) => `<img src="${m.src}" alt="${esc(d.cap)}${m.label ? '(' + esc(m.label) + ')' : ''}" data-dgi="${i}"${i ? ' hidden' : ' loading="lazy"'} onerror="this.dataset.err=1;var f=this.parentNode;if(![].some.call(f.querySelectorAll('img'),function(x){return !x.dataset.err})){f.classList.remove('has-img');f.querySelectorAll('img,.dg-switch').forEach(function(x){x.remove()})}">`).join('')}<figcaption>${esc(d.cap)}</figcaption>${d.svg ? `<details class="diagram-line"><summary>線の図でも見る</summary>${d.svg}</details>` : ''}</figure>`;
       }
       return `<figure class="diagram">${d.svg}<figcaption>${esc(d.cap)}</figcaption></figure>`;
     }
@@ -416,10 +416,15 @@
   }
 
   document.addEventListener('click', e => {
-    const t = e.target.closest('[data-play],[data-style],[data-done],[data-save],[data-ans],[data-next],[data-retry],[data-theme],[data-reset],[data-reonboard],[data-field]');
+    const t = e.target.closest('[data-dg],[data-play],[data-style],[data-done],[data-save],[data-ans],[data-next],[data-retry],[data-theme],[data-reset],[data-reonboard],[data-field]');
     if (!t) return;
     const d = t.dataset;
-    if (d.field) {
+    if (d.dg !== undefined) {
+      const f = t.closest('figure');
+      f.querySelectorAll('[data-dg]').forEach(b => { const on = b === t; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+      f.querySelectorAll('img[data-dgi]').forEach(im => { im.hidden = im.dataset.dgi !== d.dg; });
+    }
+    else if (d.field) {
       const b = d.field.startsWith('b:') ? d.field.slice(2) : null;
       S.field = b ? 'beauty' : 'hair'; if (b) S.sub = b; save();
       const n = location.hash.slice(2).split('/')[0];
